@@ -6,3 +6,5 @@ first we will npm init => create a package.json file
 => Nodemon as the file save or change it restart the server => install nodemon
 => devDependency use during the development not in production only use in development
 => package.json => script => "div" : "nodemon path of file which will be reload" "div" : "nodemon src/index.js"
+=> use Git Bash for better and easy to use 
+=> use Prettier => install it => use for better teamwork
