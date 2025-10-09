@@ -1,0 +1,18 @@
+{
+  "name": "haider",
+  "version": "1.0.0",
+  "description": "backEnd basic notes for biggner",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "JavaScript",
+    "Node",
+    "JS",
+    "Mongoose",
+    "MongoDb"
+  ],
+  "author": "Ali Haider",
+  "license": "ISC"
+}

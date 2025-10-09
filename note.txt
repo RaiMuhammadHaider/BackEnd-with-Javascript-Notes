@@ -1,0 +1,2 @@
+first we will npm init => create a package.json file 
+=> git init => Add file => 
