@@ -17,9 +17,7 @@
   "author": "Ali Haider",
   "license": "ISC",
   "devDependencies": {
-    "nodemon": "^3.1.10"
-  },
-  "dependencies": {
-    "prettier": "^3.6.2"
+    "nodemon": "^3.1.10",
+    "prettier": "3.6.2"
   }
 }
