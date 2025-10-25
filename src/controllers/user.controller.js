@@ -9,12 +9,18 @@ const userRegisterController = asyncHandler(async (req  , res ) => {
     if ([username , email , fullName , password].some( (field) => field.trim() === "" )  ) {
         throw new apiError(400 , "All fields are required ")
     }
+    console.log(username);
+    
     const userExist = await User.findOne({$or : [ {email} , {username}]}) // check user already exists
     if (userExist) {
         throw new apiError(409 , "User with same Email , or Username ALready exist")
     }
     const avatarLocalPath = req.files?.avatar[0]?.path
-    const coverImageLocalPath = req.files?.coverImage[0]?.path
+    // const coverImageLocalPath = req.files?.coverImage[0]?.path
+   let coverImageLocalPath 
+    if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) { // check if coverImage is provided if not then it will be undefined
+        coverImageLocalPath = req.files.coverImage[0].path
+    }
     if (!avatarLocalPath) {
         throw new apiError(400 , "avatar is required" )
     }
@@ -30,9 +36,9 @@ const userRegisterController = asyncHandler(async (req  , res ) => {
             username: username.toLowerCase(),
             fullName,
             avatar : avatar.url,
-            coverImage : coverImage.url || "",
+            coverImage : coverImage?.url || "",
         })
-        const createUser =    User.findById(user._id).select( // remove password and refreshToken from response
+        const createUser =  await  User.findById(user._id).select( // remove password and refreshToken from response
             "-password -refreshToken"
         )
         if (!createUser) { 
