@@ -11,7 +11,7 @@ class apiError extends Error {
         this.statusCode = statusCode
         this.success = false
         this.data = null
-        if (stack) {
+        if (stack) { //Stack trace showing where the error occurred (file, line, column, function calls).
             this.stack = stack
         }
         else{
