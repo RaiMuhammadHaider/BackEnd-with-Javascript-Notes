@@ -1,3 +1,4 @@
+//this is High order function yani asa function jo k ak or function lata ha as a parameter or usy retun kr deta ha 
 const asyncHandler = (requestHandler) => (req , res , next) => {
     Promise.resolve(requestHandler(req, res, next)).catch(
         error => next(error)
