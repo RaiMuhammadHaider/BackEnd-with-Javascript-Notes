@@ -3,6 +3,20 @@ import { apiError } from "../utils/apiError.js";
 import {User} from '../models/user.model.js'
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import {apiResponse} from '../utils/apiResponse.js'
+
+const generateAccessAndRefreshToken = async(userId)=> {
+try {
+    const user =  await User.findById(userId)
+    const accessToken = user.generateAccessToken()
+    const refreshToken = user.generateRefreshToken()
+    user.refreshToken = refreshToken
+    await user.save({validateBeforeSave : false})
+    return {accessToken , refreshToken}
+} catch (error) {
+    throw new apiError(500 , "something went worng ")
+}
+}
+
 const userRegisterController = asyncHandler(async (req  , res ) => {
 
     const {username , email , fullName , password } = req.body
@@ -10,14 +24,14 @@ const userRegisterController = asyncHandler(async (req  , res ) => {
         throw new apiError(400 , "All fields are required ")
     }
     console.log(username);
-    
-    const userExist = await User.findOne({$or : [ {email} , {username}]}) // check user already exists
+   
+    const userExist = await User.findOne({$or : [ {email} , {username}]}) // check user already exists , $ sign sy mongose k operators milty hn  yahan pe or operator ha
     if (userExist) {
         throw new apiError(409 , "User with same Email , or Username ALready exist")
     }
-    const avatarLocalPath = req.files?.avatar[0]?.path
+    const avatarLocalPath = req.files?.avatar[0]?.path // multer give the access of file
     // const coverImageLocalPath = req.files?.coverImage[0]?.path
-   let coverImageLocalPath 
+   let coverImageLocalPath
     if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) { // check if coverImage is provided if not then it will be undefined
         coverImageLocalPath = req.files.coverImage[0].path
     }
@@ -39,19 +53,49 @@ const userRegisterController = asyncHandler(async (req  , res ) => {
             coverImage : coverImage?.url || "",
         })
         const createUser =  await  User.findById(user._id).select( // remove password and refreshToken from response
-            "-password -refreshToken"
+            "-password -refreshToken" // by default tu sary selected hoty hn lakin - sign ka matlb hota ha kiya kiya nahi chahiya
         )
-        if (!createUser) { 
+        if (!createUser) {
             throw new apiError(500 , "Something went wrong while register the user Internal Server " )
-            
+           
         }
         return res.status(201).json(
             new apiResponse(200 , createUser , "user register successfully" )
         )
-    
+   
 
  
 })
+const userLoginController = asyncHandler( async (req, res)=> {
+    const  {username , email , password} = req.body
+    if (!email || !username) {
+         throw new apiError(400 , "Email or username is required ")
+    }
+    const user = await User.findOne({
+        $or : [{username} , {email}]
+    })
+    if (!user) {
+        throw new apiError(404 , "User does not exist")
+    }
+    const isPasswordValid = await user.isPasswordCorrect(password)
+    if (!isPasswordValid) {
+        throw new apiError(401 , 'Invalid user Credentials ')
+    }
+    const {refreshToken , accessToken} = await generateAccessAndRefreshToken(user._id)
+    const logginUser = await User.findById(user._id).select("-password -refreshToken")
+    const option = {
+        httpOnly : true,
+        secure : true
+    }
+    return res.status(200).cookie("accessToken" , accessToken, option).cookie("refreshToken", refreshToken, option)
+    .json(
+        new apiResponse(200, {
+            user:logginUser, accessToken, refreshToken
+        }, "user logged in successFully ")
+    )
+} )
+
+const userLogedOut = asyncHandler()
 
 export {userRegisterController}
 
