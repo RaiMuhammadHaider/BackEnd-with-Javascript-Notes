@@ -68,7 +68,7 @@ const userRegisterController = asyncHandler(async (req  , res ) => {
 })
 const userLoginController = asyncHandler( async (req, res)=> {
     const  {username , email , password} = req.body
-    if (!email || !username) {
+    if (!email && !username) {
          throw new apiError(400 , "Email or username is required ")
     }
     const user = await User.findOne({
@@ -87,7 +87,9 @@ const userLoginController = asyncHandler( async (req, res)=> {
         httpOnly : true, // mean these cookies can be only modify by the server not by the frontend 
         secure : true
     }
-    return res.status(200).cookie("accessToken" , accessToken, option).cookie("refreshToken", refreshToken, option)
+    return res.status(200)
+    .cookie("accessToken" , accessToken, option)
+    .cookie("refreshToken", refreshToken, option)
     .json(
         new apiResponse(200, {
             user:logginUser, accessToken, refreshToken // we are sending these in retun so frontend can save it in local storage
