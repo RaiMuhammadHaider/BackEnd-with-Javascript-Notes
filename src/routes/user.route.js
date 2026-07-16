@@ -16,5 +16,6 @@ router.route('/register').post(
     ])
 
     , userRegisterController) // router for user registration
-
+  router.route("/login").post(  userLoginController)
+    router.route("/logout").post( verifyJwt ,userLogedOut)
 export default router
