@@ -2,7 +2,7 @@ import { apiError } from "../utils/apiError";
 import { asyncHandler } from "../utils/asyncHandler";
 import jwt from "jsonwebtoken"
 import { User } from "../models/user.model";
-export const verifyJwt = asyncHandler(async(req , _ , next)=>{
+export const verifyJwt = asyncHandler(async(req , _ , next)=>{ // industry practice to use a _ when we are not using the req , res 
 try {
     const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer " , "")
     if ( !token) {
@@ -20,3 +20,4 @@ try {
     throw new apiError(401 , error?.message || "Invalid accesstoken")
 }
 })
+// and this one is the auth middle ware the user can only get access when it is authenticated for example a user can logged out then he is login so it must bi authenticated before logout 

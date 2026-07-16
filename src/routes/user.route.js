@@ -17,5 +17,5 @@ router.route('/register').post(
 
     , userRegisterController) // router for user registration
   router.route("/login").post(  userLoginController)
-    router.route("/logout").post( verifyJwt ,userLogedOut)
+    router.route("/logout").post( verifyJwt ,userLogedOut) // add secure route by implimenting the auth middleware 
 export default router
