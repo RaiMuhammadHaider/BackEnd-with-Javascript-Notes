@@ -84,20 +84,39 @@ const userLoginController = asyncHandler( async (req, res)=> {
     const {refreshToken , accessToken} = await generateAccessAndRefreshToken(user._id)
     const logginUser = await User.findById(user._id).select("-password -refreshToken")
     const option = {
-        httpOnly : true,
+        httpOnly : true, // mean these cookies can be only modify by the server not by the frontend 
         secure : true
     }
     return res.status(200).cookie("accessToken" , accessToken, option).cookie("refreshToken", refreshToken, option)
     .json(
         new apiResponse(200, {
-            user:logginUser, accessToken, refreshToken
+            user:logginUser, accessToken, refreshToken // we are sending these in retun so frontend can save it in local storage
         }, "user logged in successFully ")
     )
 } )
 
-const userLogedOut = asyncHandler()
+const userLogedOut = asyncHandler(async(req , res )=> {
+    await User.findByIdAndUpdate(
+        req.user._id, {
+            $set:{
+                refreshToken: undefined
+            }
+        },
+        {
+            new : true
+        }
+    )
+    const options = {
+        httpOnly: true,
+        secure : true
+    }
+    return res.status(200)
+    .clearCookie("accessToken", accessToken, options)
+    .clearCookie("refreshToken", options)
+    .json(new apiResponse(200 , {}, "User Loged Out successfully"))
+})
 
-export {userRegisterController}
+export {userRegisterController , userLoginController , userLogedOut}
 
 
 
